@@ -7,6 +7,7 @@ The system combines retrieval-augmented generation (RAG), a LangGraph researcher
 <img width="1891" height="883" alt="Screenshot From 2026-08-25 05-23-57" src="https://github.com/user-attachments/assets/0c51406d-e3b8-44e0-9d03-28d28fc27e52" />
 <img width="1895" height="553" alt="Screenshot From 2026-08-25 05-23-52" src="https://github.com/user-attachments/assets/3e8301f2-37e6-4bfb-8f19-a2c79850fd7a" />
 <img width="1895" height="643" alt="Screenshot From 2026-08-25 05-23-45" src="https://github.com/user-attachments/assets/2e815457-cdbf-42a2-977c-0656156555e6" />
+<img width="1691" height="930" alt="33ea59eb-d749-4f76-80db-d2e66cc37212" src="https://github.com/user-attachments/assets/b14dfd47-e3b9-473f-b6c0-91b2f2de5eee" />
 
 
 ## Contents
