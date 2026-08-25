@@ -4,6 +4,8 @@ BookMind is an evidence-grounded, multi-agent question-answering application for
 
 The system combines retrieval-augmented generation (RAG), a LangGraph researcher/reviewer workflow, NeMo Guardrails, typed API contracts, Qdrant vector search, and Redis caching. Unsupported or unsafe requests are blocked or refused instead of being answered from the model's general knowledge.
 
+<img width="1891" height="883" alt="Screenshot From 2026-08-25 05-23-57" src="https://github.com/user-attachments/assets/0c51406d-e3b8-44e0-9d03-28d28fc27e52" />
+
 ## Contents
 
 - [Key capabilities](#key-capabilities)
