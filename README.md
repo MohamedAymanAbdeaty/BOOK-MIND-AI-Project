@@ -615,35 +615,6 @@ docker compose logs qdrant
 docker compose logs redis
 ```
 
-### The embedding model is slow on first start
-
-Sentence Transformers downloads and loads the model on first use. Later requests reuse the in-process model instance. Ensure the machine has adequate memory and access to the model files.
-
-### Groq requests fail
-
-Verify `GROQ_API_KEY`, `GROQ_MODEL`, and `GROQ_REVIEWER_MODEL`. The configured model names must be available to the associated Groq account.
-
-### Old answers remain after re-ingestion
-
-Increment `CORPUS_VERSION` in `.env`. The new version changes cache keys without requiring a destructive Redis flush.
-
-## Production considerations
-
-Before deploying BookMind publicly:
-
-- Replace `SECRET_KEY` and manage all secrets through a secure secret store.
-- Run behind TLS and a reverse proxy.
-- Add authentication and authorization if the corpus is private.
-- Add per-user and per-IP rate limiting.
-- Restrict CORS and allowed hosts to expected origins.
-- Add structured request logging with privacy and retention controls.
-- Add deep readiness checks for Qdrant, Redis, the embedding model, and the LLM provider.
-- Add request timeouts, retries, circuit breakers, and monitoring for external services.
-- Pin and regularly update container images and Python dependencies.
-- Back up Qdrant and Redis volumes according to recovery requirements.
-- Review the legal rights and licensing for every ingested book.
-- Treat regex and LLM guardrails as defense-in-depth controls, not a standalone security boundary.
-- Run multiple Gunicorn workers only after accounting for the memory cost of loading an embedding model in each worker process.
 
 ## Author
 
