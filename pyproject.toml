@@ -1,0 +1,12 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --disable-warnings"
+pythonpath = ["."]
+
+[tool.coverage.run]
+source = ["app", "ingestion"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="BookMind is a grounded, reviewer-verified way to explore books.">
+  <meta name="theme-color" content="#101713">
+  <meta property="og:title" content="BookMind — Grounded Book Intelligence">
+  <meta property="og:description" content="Ask a book. See the evidence. Trust the answer.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ site_origin }}/">
+  <meta property="og:image" content="{{ site_origin }}{{ url_for('static', filename='images/og.png') }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="BookMind — Grounded Book Intelligence">
+  <meta name="twitter:description" content="Ask a book. See the evidence. Trust the answer.">
+  <meta name="twitter:image" content="{{ site_origin }}{{ url_for('static', filename='images/og.png') }}">
+  <title>BookMind — Grounded Book Intelligence</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/logo.logo.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <header class="topbar">
+    <button class="brand" id="brandButton" type="button" aria-label="Return to library">
+      <img src="{{ url_for('static', filename='images/logo.logo.png') }}" class="brand-logo" alt="Logo" style="height: 24px; margin-right: 8px;">
+      <span>BookMind</span>
+    </button>
+    <div class="system-status"><span></span> System online</div>
+  </header>
+
+  <main>
+    <section id="libraryView" class="library-view">
+      <div class="hero">
+        <p class="eyebrow">A library that answers with evidence</p>
+        <h1>Read between<br><em>the lines.</em></h1>
+        <p class="hero-copy">Ask a question. BookMind searches only the book you choose, checks every claim, and shows you the pages behind the answer.</p>
+        <div class="hero-note author-credit">
+          <a class="author-link" href="https://www.linkedin.com/in/mohamed-ayman-abdelaty/" target="_blank" rel="noopener noreferrer" aria-label="Visit Mohamed Ayman's LinkedIn profile">
+            <img src="{{ url_for('static', filename='images/author.jpg') }}" alt="Mohamed Ayman" class="author-photo">
+          </a>
+          <p>made by Mohamed Ayman<br>AI eng</p>
+        </div>
+      </div>
+
+      <section class="shelf" aria-labelledby="shelfTitle">
+        <div class="section-heading">
+          <h2 id="shelfTitle">Choose a book</h2>
+          <p>Each conversation stays inside one text.</p>
+        </div>
+        <div class="book-grid" id="bookGrid" aria-live="polite"></div>
+      </section>
+    </section>
+
+    <section id="chatView" class="chat-view" hidden>
+      <aside class="book-sidebar">
+        <button id="backButton" class="back-button" type="button">← Library</button>
+        <div id="activeCover" class="mini-cover"></div>
+        <p class="sidebar-label">Selected text</p>
+        <h2 id="activeTitle"></h2>
+        <p id="activeAuthor" class="author"></p>
+        <div class="sidebar-rule"></div>
+        <div class="trust-item"><span>01</span><p>Search is filtered to this book</p></div>
+        <div class="trust-item"><span>02</span><p>Every answer passes evidence review</p></div>
+        <div class="trust-item"><span>03</span><p>Unsupported questions are refused</p></div>
+      </aside>
+
+      <div class="conversation">
+        <header class="conversation-header">
+          <div>
+            <p class="eyebrow">Grounded conversation</p>
+            <h1>Ask the book.</h1>
+          </div>
+          <button id="clearButton" class="quiet-button" type="button">Clear conversation</button>
+        </header>
+
+        <div id="messages" class="messages" aria-live="polite">
+          <div class="welcome-message">
+            <span class="spark">✦</span>
+            <h2>What would you like to understand?</h2>
+            <p>I’ll search the selected book, draft an answer, then ask a reviewer to verify it against the retrieved passages.</p>
+            <div id="suggestions" class="suggestions"></div>
+          </div>
+        </div>
+
+        <form id="chatForm" class="composer">
+          <label for="question" class="sr-only">Ask a question about the selected book</label>
+          <textarea id="question" name="question" rows="1" maxlength="1200" placeholder="Ask about an idea, passage, or theme…" required></textarea>
+          <button id="sendButton" type="submit" aria-label="Send question">Ask <span>↗</span></button>
+        </form>
+        <p class="composer-note">BookMind answers from retrieved text, not general knowledge.</p>
+      </div>
+    </section>
+  </main>
+
+  <template id="messageTemplate">
+    <article class="message">
+      <div class="message-meta"></div>
+      <div class="message-body"></div>
+    </article>
+  </template>
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+-r requirements.txt
+pytest>=8.3,<10
+pytest-cov>=6,<8
+ragas>=0.2,<1
+datasets>=3.2,<5
+

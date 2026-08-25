@@ -1,0 +1,14 @@
+Flask>=3.1,<4
+gunicorn>=23,<24
+pydantic>=2.10,<3
+pydantic-settings>=2.7,<3
+langgraph>=0.3,<2
+langchain>=0.3,<2
+groq>=0.18,<1
+qdrant-client>=1.13,<2
+redis>=5.2,<7
+sentence-transformers>=3.4,<6
+PyMuPDF>=1.25,<2
+
+# NeMo Guardrails — LLM-powered input/output safety rails via Colang
+nemoguardrails>=0.10,<1
