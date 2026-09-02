@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "app/main.py": {
+      "excludeFiles": "{tests/**,scripts/**,data/**,**/__pycache__/**,**/*.pyc,Dockerfile,docker-compose.yml,requirements-dev.txt}",
+      "maxDuration": 300
+    }
+  }
+}

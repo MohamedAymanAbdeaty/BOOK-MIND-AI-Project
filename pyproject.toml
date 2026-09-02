@@ -1,3 +1,36 @@
+[project]
+name = "bookmind"
+version = "1.0.0"
+description = "Evidence-grounded book question-answering application"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "Flask>=3.1,<4",
+    "gunicorn>=23,<24",
+    "pydantic>=2.10,<3",
+    "pydantic-settings>=2.7,<3",
+    "langgraph>=0.3,<2",
+    "langchain>=0.3,<2",
+    "groq>=0.18,<1",
+    "qdrant-client>=1.13,<2",
+    "redis>=5.2,<7",
+    "sentence-transformers>=3.4,<6",
+    "torch>=2.2",
+    "PyMuPDF>=1.25,<2",
+    "nemoguardrails>=0.10,<1",
+]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.vercel]
+entrypoint = "app.main:app"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q --disable-warnings"

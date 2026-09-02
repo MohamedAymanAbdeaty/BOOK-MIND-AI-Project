@@ -1,3 +1,4 @@
+import os
 import threading
 
 from flask import Flask, render_template
@@ -22,12 +23,15 @@ def create_app(settings: Settings | None = None) -> Flask:
     # Load the embedding model in the background so the first request isn't slow
     def _prewarm():
         try:
-            from app.services.embedding_service import EmbeddingService
+            from app.services.embedding import EmbeddingService
             EmbeddingService(s.embedding_model).embed_query("warmup")
             app.logger.info("Embedding model pre-warmed and ready.")
         except Exception as exc:
             app.logger.warning("Embedding pre-warm failed: %s", exc)
 
-    threading.Thread(target=_prewarm, daemon=True, name="embed-prewarm").start()
+    # Serverless runtimes may freeze background work as soon as a response is
+    # returned. Load the model on the first chat request there instead.
+    if not os.getenv("VERCEL"):
+        threading.Thread(target=_prewarm, daemon=True, name="embed-prewarm").start()
 
     return app
