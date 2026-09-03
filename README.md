@@ -1,6 +1,6 @@
 # BookMind
 
-LIVE AT  : https://bookmind-e3zg2gh21-mohamedaymanabdeatys-projects.vercel.app/
+LIVE AT: https://bookmind-mohamedaymanabdeatys-projects.vercel.app/
 BookMind is an evidence-grounded, multi-agent question-answering application for books. A user selects a book, asks a question, and receives an answer only when the response can be supported by passages retrieved from that book.
 
 The system combines retrieval-augmented generation (RAG), a LangGraph researcher/reviewer workflow, NeMo Guardrails, typed API contracts, Qdrant vector search, and Redis caching. Unsupported or unsafe requests are blocked or refused instead of being answered from the model's general knowledge.
