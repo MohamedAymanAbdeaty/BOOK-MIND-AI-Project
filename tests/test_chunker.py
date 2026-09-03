@@ -9,6 +9,10 @@ def test_cleaner_repairs_hyphenated_line_breaks():
     assert clean_text("finan-\ncial   intelligence") == "financial intelligence"
 
 
+def test_cleaner_removes_pdf_control_characters():
+    assert clean_text("Sun\x01\x02 Tzu") == "Sun Tzu"
+
+
 def test_chunker_preserves_page_metadata_and_overlap():
     page = PageText(page=7, text=" ".join(f"word{i}" for i in range(130)))
     chunks = chunk_pages([page], chunk_words=60, overlap_words=10)

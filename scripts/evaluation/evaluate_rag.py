@@ -10,7 +10,12 @@ def load_dataset(path: str | Path = "scripts/evaluation/dataset.json") -> list[d
 def run_ragas(dataset_path: str = "scripts/evaluation/dataset.json"):
     from datasets import Dataset
     from ragas import evaluate
-    from ragas.metrics import answer_relevancy, context_precision, context_recall, faithfulness
+    from ragas.metrics import (
+        answer_relevancy,
+        context_precision,
+        context_recall,
+        faithfulness,
+    )
 
     rows = [row for row in load_dataset(dataset_path) if row.get("answer") and row.get("contexts")]
     if not rows:

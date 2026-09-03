@@ -10,7 +10,6 @@ from pydantic import ValidationError
 
 from app.config import Settings
 
-
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 
 @pytest.fixture
@@ -256,7 +255,7 @@ def make_groq_response(content):
 def test_llm_raises_without_api_key():
     from app.services.llm import LLMService
     with pytest.raises(RuntimeError, match="GROQ_API_KEY"):
-        LLMService(api_key="", model="test").client
+        _ = LLMService(api_key="", model="test").client
 
 def test_llm_parse_json_clean():
     from app.services.llm import LLMService

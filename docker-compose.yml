@@ -7,7 +7,7 @@ services:
       - path: .env
         required: false
     environment:
-      DEMO_MODE: ${DEMO_MODE:-true}
+      DEMO_MODE: ${DEMO_MODE:-false}
       QDRANT_URL: http://qdrant:6333
       REDIS_URL: redis://redis:6379/0
     depends_on:

@@ -113,7 +113,7 @@ run_connected() {
     echo -e "${GREEN}${BOLD}Server running at: http://localhost:5000${NC}"
     echo -e "${YELLOW}Press Ctrl+C to stop.${NC}\n"
 
-    python app.py
+    python -m app.main
 }
 
 run_docker() {
@@ -151,7 +151,7 @@ run_ingest() {
     setup_venv
 
     print_info "Running ingestion script..."
-    python -m ingestion.ingest "$@"
+    python -m scripts.ingestion.ingest "$@"
 }
 
 # Main routing logic

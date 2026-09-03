@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-import re
 
 from scripts.ingestion.cleaner import clean_text
 from scripts.ingestion.loader import PageText

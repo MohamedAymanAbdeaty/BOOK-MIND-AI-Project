@@ -40,6 +40,7 @@ The system combines retrieval-augmented generation (RAG), a LangGraph researcher
 - Caches only reviewer-approved answers.
 - Supports page-specific questions such as `What is discussed on page 25?`.
 - Provides a responsive web interface and JSON API.
+- Handles simple greetings without sending them through evidence retrieval.
 
 ## Technology stack
 
@@ -448,6 +449,7 @@ Settings are loaded from `.env` through `pydantic-settings`.
 | `QDRANT_API_KEY` | empty | Optional Qdrant API key |
 | `QDRANT_COLLECTION` | `book_chunks` | Prefix for per-book collection names |
 | `REDIS_URL` | `redis://redis:6379/0` in code | Redis endpoint; use `localhost` for host development |
+| `DEMO_MODE` | `false` | Uses the bundled PDFs and credential-free extractive answers when enabled |
 | `CACHE_TTL_SECONDS` | `86400` | Approved-answer cache lifetime in seconds |
 | `CORPUS_VERSION` | `v1` | Cache namespace version; increment after corpus changes |
 | `RETRIEVAL_TOP_K` | `5` | Maximum retrieved passages per search |
@@ -455,7 +457,7 @@ Settings are loaded from `.env` through `pydantic-settings`.
 | `MAX_QUESTION_CHARS` | `1200` | Input guard question-length limit |
 | `MAX_REVISION_COUNT` | `1` | Maximum researcher revisions after reviewer failure |
 
-`DEMO_MODE` appears in the example and Compose environment for compatibility, but the current application runtime does not implement a separate credential-free demo backend. A Groq API key and ingested Qdrant collections are required for grounded chat responses.
+Set `DEMO_MODE=true` to use the bundled PDFs through the read-only local retriever. When no Groq API key is configured, BookMind returns a conservative cited extract instead of calling an external model. With `DEMO_MODE=false`, Qdrant remains the primary retriever and the bundled PDFs are used only when the selected collection is unavailable or returns no evidence.
 
 When changing `EMBEDDING_MODEL`, recreate and re-ingest the Qdrant collections because vector dimensions may differ.
 

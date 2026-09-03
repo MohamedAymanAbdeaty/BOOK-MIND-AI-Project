@@ -48,3 +48,5 @@ def test_health_endpoint(settings):
     payload = make_client(settings).get("/api/health").get_json()
     assert payload["status"] == "ok"
     assert "corpus_version" in payload
+    assert payload["retrieval_mode"] == "qdrant_with_local_fallback"
+    assert payload["answer_mode"] == "extractive"

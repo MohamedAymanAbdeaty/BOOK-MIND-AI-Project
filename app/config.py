@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -21,13 +23,9 @@ class Settings(BaseSettings):
     retrieval_score_threshold: float = 0.36
     max_question_chars: int = 1200
     max_revision_count: int = 1
+    demo_mode: bool = False
 
 
-_settings_cache = None
-
-
+@lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    global _settings_cache
-    if _settings_cache is None:
-        _settings_cache = Settings()
-    return _settings_cache
+    return Settings()

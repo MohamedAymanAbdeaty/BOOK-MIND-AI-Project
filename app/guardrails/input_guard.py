@@ -1,20 +1,13 @@
 import re
-from collections import namedtuple
+from dataclasses import dataclass
 
 from app.catalog import BOOKS
 
-
-# Result returned by check() — allowed=True means the request can proceed
-GuardDecision = namedtuple("GuardDecision", ["allowed", "code", "message"], defaults=["allowed", ""])
-
 PROHIBITED_ACTION_MESSAGE = (
     "I’m sorry, but I can’t delete or modify books or library data. "
-    "BookMind is a read-only assistant; I can help you explore and understand the selected book instead."
+    "BookMind is a read-only assistant; I can help you explore and "
+    "understand the selected book instead."
 )
-
-
-# ── Regex fallback ────────────────────────────────────────────────────────────
-# Used when NeMo Guardrails is not configured (no API key, etc.)
 
 INJECTION_PATTERNS = [
     r"\bignore\s+(all\s+)?(previous|prior|above)\s+instructions?\b",
@@ -32,83 +25,83 @@ OUT_OF_SCOPE_PATTERNS = [
     r"\bbook (a |an )?(flight|hotel|restaurant)\b",
 ]
 
-# Administrative and destructive requests are never sent to the RAG pipeline.
-# Requiring a library-related target avoids blocking ordinary book questions such
-# as "What does the author say about removing fear?".
 PROHIBITED_ACTION_PATTERNS = [
     r"\b(delete|remove|erase|destroy|purge)\b.{0,50}\b(book|books|library|catalog|collection)\b",
     r"\b(clear|reset|wipe)\b.{0,50}\b(library|catalog|book collection|book data)\b",
     r"\b(add|upload|import|replace|rename|edit|modify|update|change)\b.{0,50}\b(book|books|book content|metadata|library|catalog|collection)\b",
 ]
 
-_injection_regexes = [re.compile(p, re.IGNORECASE) for p in INJECTION_PATTERNS]
-_scope_regexes = [re.compile(p, re.IGNORECASE) for p in OUT_OF_SCOPE_PATTERNS]
-_prohibited_action_regexes = [re.compile(p, re.IGNORECASE) for p in PROHIBITED_ACTION_PATTERNS]
+
+def _compile_patterns(patterns: list[str]) -> list[re.Pattern]:
+    return [re.compile(pattern, re.IGNORECASE) for pattern in patterns]
 
 
-def _regex_is_injection(text: str) -> bool:
+INJECTION_RULES = _compile_patterns(INJECTION_PATTERNS)
+OUT_OF_SCOPE_RULES = _compile_patterns(OUT_OF_SCOPE_PATTERNS)
+PROHIBITED_ACTION_RULES = _compile_patterns(PROHIBITED_ACTION_PATTERNS)
+
+
+@dataclass(frozen=True)
+class GuardDecision:
+    allowed: bool
+    code: str = "allowed"
+    message: str = ""
+
+
+def _matches_any(text: str, rules: list[re.Pattern]) -> bool:
     normalized = " ".join(text.split())
-    return any(r.search(normalized) for r in _injection_regexes)
+    return any(rule.search(normalized) for rule in rules)
 
 
-def _regex_is_off_topic(text: str) -> bool:
-    return any(r.search(text) for r in _scope_regexes)
-
-
-def _regex_is_prohibited_action(text: str) -> bool:
-    normalized = " ".join(text.split())
-    return any(r.search(normalized) for r in _prohibited_action_regexes)
-
-
-# ── Book-level scope check ────────────────────────────────────────────────────
-# Always runs regardless of whether NeMo or regex is used.
-# NeMo doesn't know which book is selected, so this stays in Python.
-
-def _check_book_scope(book_id: str, question: str) -> tuple[bool, str]:
+def _check_book_scope(book_id: str, question: str) -> GuardDecision | None:
     if book_id not in BOOKS:
-        return False, "The selected book is not available."
-    selected = BOOKS[book_id]["title"].lower()
+        return GuardDecision(False, "out_of_scope", "The selected book is not available.")
+
+    selected_title = BOOKS[book_id]["title"].lower()
+    question = question.lower()
+
     for other_id, book in BOOKS.items():
-        if other_id != book_id and book["title"].lower() in question.lower() and selected not in question.lower():
-            return False, f"That question appears to be about {book['title']}. Please select that book first."
-    return True, ""
+        other_title = book["title"].lower()
+        asks_about_other_book = other_id != book_id and other_title in question
+        if asks_about_other_book and selected_title not in question:
+            message = f"That question appears to be about {book['title']}. Please select that book first."
+            return GuardDecision(False, "out_of_scope", message)
+    return None
 
-
-# ── InputGuard ────────────────────────────────────────────────────────────────
 
 class InputGuard:
     def __init__(self, max_chars: int = 1200, nemo_guard=None):
         self.max_chars = max_chars
-        self.nemo = nemo_guard  # NemoGuard instance, or None for regex-only mode
+        self.nemo = nemo_guard
 
     def check(self, book_id: str, question: str) -> GuardDecision:
         text = question.strip()
 
-        # 1. Fast checks — no LLM needed
         if not text:
             return GuardDecision(False, "invalid_input", "Please enter a question.")
         if len(text) > self.max_chars:
-            return GuardDecision(False, "invalid_input", f"Questions must be under {self.max_chars} characters.")
-
-        # 2. Deterministic read-only boundary — always enforced, even if NeMo is
-        # unavailable or incorrectly classifies the request.
-        if _regex_is_prohibited_action(text):
+            message = f"Questions must be under {self.max_chars} characters."
+            return GuardDecision(False, "invalid_input", message)
+        if _matches_any(text, PROHIBITED_ACTION_RULES):
             return GuardDecision(False, "prohibited_action", PROHIBITED_ACTION_MESSAGE)
 
-        # 3. Content safety — NeMo Guardrails when API key is set, regex otherwise
+        safety_result = self._check_safety(text)
+        if safety_result:
+            return safety_result
+
+        scope_result = _check_book_scope(book_id, text)
+        return scope_result or GuardDecision(True)
+
+    def _check_safety(self, text: str) -> GuardDecision | None:
+        if _matches_any(text, INJECTION_RULES):
+            message = "This request was blocked by the prompt-injection guard."
+            return GuardDecision(False, "prompt_injection", message)
+        if _matches_any(text, OUT_OF_SCOPE_RULES):
+            message = "I can only answer questions supported by the selected book."
+            return GuardDecision(False, "out_of_scope", message)
+
         if self.nemo:
             allowed, code, message = self.nemo.check(text)
             if not allowed:
                 return GuardDecision(False, code, message)
-        else:
-            if _regex_is_injection(text):
-                return GuardDecision(False, "prompt_injection", "This request was blocked by the prompt-injection guard.")
-            if _regex_is_off_topic(text):
-                return GuardDecision(False, "out_of_scope", "I can only answer questions supported by the selected book.")
-
-        # 4. Book-level scope — always run (NeMo doesn't know which book is selected)
-        ok, message = _check_book_scope(book_id, text)
-        if not ok:
-            return GuardDecision(False, "out_of_scope", message)
-
-        return GuardDecision(True)
+        return None

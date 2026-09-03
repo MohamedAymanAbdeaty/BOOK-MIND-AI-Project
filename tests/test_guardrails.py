@@ -4,9 +4,8 @@ NeMo tests mock the guard so they never call the real Groq API.
 """
 import pytest
 
-from app.guardrails.input_guard import InputGuard, PROHIBITED_ACTION_MESSAGE
-from app.guardrails.nemo_guard import NemoGuard, _parse_response
-
+from app.guardrails.input_guard import PROHIBITED_ACTION_MESSAGE, InputGuard
+from app.guardrails.nemo_guard import _parse_response
 
 # ── Regex-fallback mode (no NeMo, i.e. no API key configured) ────────────────
 
@@ -97,7 +96,7 @@ def test_parse_response_blocked_injection():
 
 
 def test_parse_response_blocked_off_topic():
-    allowed, code, message = _parse_response(
+    allowed, code, _ = _parse_response(
         "GUARD_BLOCKED:out_of_scope: I can only answer questions supported by the selected book."
     )
     assert not allowed
@@ -120,7 +119,7 @@ def test_parse_response_allowed():
 
 
 def test_parse_response_empty_allowed():
-    allowed, code, _ = _parse_response("")
+    allowed, _, _ = _parse_response("")
     assert allowed
 
 
@@ -193,7 +192,7 @@ def test_nemo_still_blocks_oversized_question(nemo_guard_allowed):
 
 def test_nemo_guard_parse_blocked_injection():
     """_parse_response is the core logic — test it directly."""
-    ok, code, msg = _parse_response("GUARD_BLOCKED:prompt_injection: Blocked.")
+    ok, code, _ = _parse_response("GUARD_BLOCKED:prompt_injection: Blocked.")
     assert not ok and code == "prompt_injection"
 
 

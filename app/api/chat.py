@@ -2,8 +2,8 @@ from flask import Blueprint, current_app, jsonify, request
 from pydantic import ValidationError
 
 from app.catalog import BOOKS
-from app.rag.graph import build_workflow
 from app.models.request import ChatRequest
+from app.rag.graph import build_workflow
 
 chat_bp = Blueprint("chat", __name__)
 
@@ -29,8 +29,11 @@ def chat():
 
     try:
         response = _workflow().invoke(payload.book_id, payload.question)
-    except Exception as exc:
+    except Exception:
         current_app.logger.exception("RAG request failed")
-        return jsonify({"error": "service_unavailable", "message": str(exc)}), 503
+        return jsonify({
+            "error": "service_unavailable",
+            "message": "The answer service is temporarily unavailable.",
+        }), 503
 
     return jsonify(response.model_dump(mode="json"))

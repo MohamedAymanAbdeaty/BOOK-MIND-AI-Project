@@ -15,7 +15,7 @@ BOOKS = {
         "accent": "gold",
         "monogram": "AW",
         "description": "Strategy, leadership, preparation, and conflict.",
-        "cover_image":"static/images/art of war.png"
+        "cover_image": "/static/images/art of war.png",
     },
     "meditations": {
         "id": "meditations",
